@@ -1,0 +1,8 @@
+{
+    "value": [
+        "haproxyapi",
+        "ref:fd2f983b:/Volumes/Sources/haproxyapi/.bloop/haproxyapi.json"
+    ],
+    "valueHash": -711883149,
+    "inputsHash": 253775470
+}

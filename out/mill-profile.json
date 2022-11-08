@@ -1,0 +1,162 @@
+[
+    {
+        "label": "haproxyapi.scalaVersion",
+        "millis": 0,
+        "cached": true
+    },
+    {
+        "label": "mill.scalalib.ZincWorkerModule.classpath",
+        "millis": 3,
+        "cached": true
+    },
+    {
+        "label": "mill.scalalib.ZincWorkerModule.zincLogDebug",
+        "millis": 2,
+        "cached": false
+    },
+    {
+        "label": "mill.scalalib.ZincWorkerModule.worker",
+        "millis": 0,
+        "cached": true
+    },
+    {
+        "label": "haproxyapi.upstreamCompileOutput",
+        "millis": 1,
+        "cached": true
+    },
+    {
+        "label": "haproxyapi.sources",
+        "millis": 3,
+        "cached": false
+    },
+    {
+        "label": "haproxyapi.generatedSources",
+        "millis": 1,
+        "cached": true
+    },
+    {
+        "label": "haproxyapi.allSources",
+        "millis": 1,
+        "cached": false
+    },
+    {
+        "label": "haproxyapi.allSourceFiles",
+        "millis": 2,
+        "cached": false
+    },
+    {
+        "label": "haproxyapi.transitiveLocalClasspath",
+        "millis": 1,
+        "cached": true
+    },
+    {
+        "label": "haproxyapi.resources",
+        "millis": 1,
+        "cached": false
+    },
+    {
+        "label": "haproxyapi.unmanagedClasspath",
+        "millis": 0,
+        "cached": true
+    },
+    {
+        "label": "haproxyapi.platformSuffix",
+        "millis": 0,
+        "cached": true
+    },
+    {
+        "label": "haproxyapi.compileIvyDeps",
+        "millis": 1,
+        "cached": true
+    },
+    {
+        "label": "haproxyapi.transitiveCompileIvyDeps",
+        "millis": 0,
+        "cached": true
+    },
+    {
+        "label": "haproxyapi.ivyDeps",
+        "millis": 2,
+        "cached": true
+    },
+    {
+        "label": "haproxyapi.mandatoryIvyDeps.overridden.mill.scalalib.JavaModule.mandatoryIvyDeps",
+        "millis": 1,
+        "cached": true
+    },
+    {
+        "label": "haproxyapi.scalaOrganization",
+        "millis": 0,
+        "cached": true
+    },
+    {
+        "label": "haproxyapi.scalaLibraryIvyDeps",
+        "millis": 1,
+        "cached": true
+    },
+    {
+        "label": "haproxyapi.mandatoryIvyDeps",
+        "millis": 1,
+        "cached": true
+    },
+    {
+        "label": "haproxyapi.transitiveIvyDeps",
+        "millis": 2,
+        "cached": true
+    },
+    {
+        "label": "haproxyapi.resolvedIvyDeps",
+        "millis": 1,
+        "cached": true
+    },
+    {
+        "label": "haproxyapi.compileClasspath",
+        "millis": 1,
+        "cached": true
+    },
+    {
+        "label": "haproxyapi.javacOptions",
+        "millis": 0,
+        "cached": true
+    },
+    {
+        "label": "haproxyapi.mandatoryScalacOptions",
+        "millis": 1,
+        "cached": true
+    },
+    {
+        "label": "haproxyapi.scalacPluginIvyDeps",
+        "millis": 0,
+        "cached": true
+    },
+    {
+        "label": "haproxyapi.enablePluginScalacOptions",
+        "millis": 1,
+        "cached": true
+    },
+    {
+        "label": "haproxyapi.scalacOptions",
+        "millis": 0,
+        "cached": true
+    },
+    {
+        "label": "haproxyapi.allScalacOptions",
+        "millis": 0,
+        "cached": true
+    },
+    {
+        "label": "haproxyapi.scalaCompilerClasspath",
+        "millis": 1,
+        "cached": true
+    },
+    {
+        "label": "haproxyapi.scalacPluginClasspath",
+        "millis": 0,
+        "cached": true
+    },
+    {
+        "label": "haproxyapi.compile",
+        "millis": 323,
+        "cached": false
+    }
+]

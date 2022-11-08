@@ -1,0 +1,9 @@
+{
+    "value": [
+        "ref:a1d327ba:/Volumes/Sources/haproxyapi/haproxyapi/src/main/scala/haproxy/Server.scala",
+        "ref:d6b81ddd:/Volumes/Sources/haproxyapi/haproxyapi/src/main/scala/haproxy/SocketClient.scala",
+        "ref:e0e93614:/Volumes/Sources/haproxyapi/haproxyapi/src/main/scala/haproxy/main.scala"
+    ],
+    "valueHash": 775862407,
+    "inputsHash": 2063363343
+}
