@@ -1,0 +1,44 @@
+version: '3.6'
+services:
+  web_gateway:
+    image: haproxy:2.6.6-alpine
+    container_name: web_gateway
+    hostname: web_gateway
+    ports:
+      - 80:80
+    build:
+      context: ./haproxy
+      dockerfile: Dockerfile
+      network: host
+    volumes:
+      - /var/run/admin.sock:/usr/local/etc/haproxy/admin.sock
+    restart: always
+    depends_on:
+      - webapp_server_1
+      - webapp_server_2
+  webapp_server_1:
+    build:
+      context: ./nginx
+      dockerfile: web1/Dockerfile
+      network: host
+    container_name: webapp_server_1
+    hostname: webapp_server_1
+    # volumes:
+    #   - ./web1/nginx/nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - 8000:80
+      - 8001:81
+    restart: on-failure
+  webapp_server_2:
+    build:
+      context: ./nginx
+      dockerfile: web2/Dockerfile
+      network: host
+    container_name: webapp_server_2
+    hostname: webapp_server_2
+    ports:
+      - 8010:80
+      - 8011:81
+    restart: on-failure
+    # volumes:
+    #   - ./web2/nginx/nginx.conf:/etc/nginx/nginx.conf

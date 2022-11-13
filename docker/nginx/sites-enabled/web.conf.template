@@ -1,0 +1,9 @@
+server {
+  listen 80;
+  listen 81 http2;
+  server_name ;
+  charset utf-8;
+  root /var/www/html;
+
+  deny all;
+}
