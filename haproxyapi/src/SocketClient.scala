@@ -5,11 +5,11 @@ import java.io.FileInputStream
 // import cats.implicits.IO
 import com.github.tototoshi.csv._
 import scala.io.Source
+import cats.effect.IO
 // Type HAProxyCmd = String
 
 trait SocketClient {
-  val socat: String
-  val socket: String
+  def baseCmd(cmd: String) = s"""docker exec -it web_gateway sh -c "echo '${cmd}' | socat stdio tcp4-connect:127.0.0.1:9999" """
 }
 
 trait HAProxyHdrs {
@@ -51,13 +51,14 @@ object SpaceFormat {
 // }
 
 object HaProxySocketClient extends SocketClient {
-  val localFile = "/Users/jeff/server_response.csv"
-  val socat = "/usr/bin/socat stdio "
-  val socket = "/var/run/haproxy/admin.sock"
 
-
+  def runProg(command: String): IO[String] = {
+    for {
+      haProxyResult <- IO.unsafeRunSync(command)
+    } yield haProxyResult
+  }
   def cmdBuild(in: String): String = {
-    s"""echo "$in" | ${socat} ${socket} """
+    s"""${baseCmd(in)}"""
   }
 
   def servers(backend: String): String = {
