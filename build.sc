@@ -6,7 +6,7 @@ object haproxyapi extends ScalaModule {
   val CirceVersion = "0.14.1"
   def scalaVersion = "2.13.9"
   def ivyDeps = Agg(
-    ivy"org.typelevel::cats-core:2.8.0",
+    ivy"org.typelevel::cats-effect:3.4.0",
     ivy"org.http4s::http4s-core:1.0.0-M34",
     ivy"org.http4s::http4s-circe:1.0.0-M34",
     ivy"org.http4s::http4s-server:1.0.0-M34",
