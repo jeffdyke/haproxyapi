@@ -44,4 +44,3 @@ object HAProxySocket {
 
     }.unsafeRunSync()
 }
-//new java.io.ByteArrayInputStream(command.getBytes(java.nio.charset.StandardCharsets.UTF_8.name))
