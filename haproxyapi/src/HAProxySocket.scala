@@ -26,7 +26,7 @@ object HAProxySocket {
     } { in =>
       IO.blocking(in.close()).handleErrorWith(_ => IO.unit)
     }
-
+  // TODO: may have/want to pass the socket to use to ensure its closed
   def socketRequest(cmd: String) =
     (
       for {
