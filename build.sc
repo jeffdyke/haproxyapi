@@ -16,7 +16,8 @@ object haproxyapi extends ScalaModule {
     ivy"com.kohlschutter.junixsocket:junixsocket-core:2.6.1",
     ivy"com.github.tototoshi::scala-csv:1.3.10",
     ivy"org.slf4j:slf4j-api:2.0.3",
-    ivy"org.slf4j:slf4j-simple:2.0.3"
+    ivy"org.slf4j:slf4j-simple:2.0.3",
+    ivy"com.lihaoyi::pprint:0.7.0"
   )
   lazy val osName = System.getProperty("os.name") match {
     case n if n.startsWith("Linux")   => "linux"
