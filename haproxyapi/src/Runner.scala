@@ -33,14 +33,16 @@ object ccFromMap {
 }
 
 object Runner {
-  implicit val backendsDecoder: Encoder[Backends] = deriveEncoder[Backends]
-  implicit val jsonDecoder: Encoder[Backend] = deriveEncoder[Backend]
+
+  // implicit val backendsDecoder: Encoder[Backends] = deriveEncoder[Backends]
+  // implicit val jsonDecoder: Encoder[Backend] = deriveEncoder[Backend]
 
   def main(args: Array[String] = Array[String]()): Unit =  {
-    val result = HAProxySocket.socketRequest("localhost", 9999, "show servers conn")
+    val result = HAProxySocket.socketRequest("localhost", 9999, "show servers state web_app1_h1")
     val formatted = HAProxySocket.socketResponse(result)
-    val loo = formatted.foldLeft(List[Backend]())((acc, item) => {
-      acc ++: List(ccFromMap.fromMap[Backend](item))
+    val loo = formatted.foldLeft(List[BackendState]())((acc, item) => {
+      acc ++: List(ccFromMap.fromMap[BackendState](item))
     })
+    println(loo)
   }
 }
