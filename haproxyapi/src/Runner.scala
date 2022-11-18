@@ -3,38 +3,44 @@ import haproxyapi.syntax.string._
 import scala.io.Source
 import scala.jdk.CollectionConverters._
 import java.io.InputStream
-import com.github.tototoshi.csv._
+import haproxyapi.models.models._
+import io.circe._
 import io.circe.syntax._
+import io.circe.generic.semiauto._
+import io.circe.generic._
+import scala.reflect._
+import scala.reflect.runtime.universe._
 
-case class BackendResponse(
-  bkname: String,
-  svname: String,
-  bkid: Int,
-  svid: Int,
-  addr: String,
-  port: Int,
-  purgeDelay: Int,
-  usedCur: Int,
-  usedMax: Int,
-  needEst: Int,
-  unsafeNb: Int,
-  safeNb: Int,
-  idleLim: Int,
-  idleCur: Int,
-  idlePerThr: Int
-)
+object ccFromMap {
+
+  def fromMap[T: TypeTag: ClassTag](m: Map[String, String]) = {
+    val rm = runtimeMirror(classTag[T].runtimeClass.getClassLoader)
+    val classTest = typeOf[T].typeSymbol.asClass
+    val classMirror = rm.reflectClass(classTest)
+    val constructor = typeOf[T].decl(termNames.CONSTRUCTOR).asMethod
+    val constructorMirror = classMirror.reflectConstructor(constructor)
+
+    val constructorArgs = constructor.paramLists.flatten.map( (param: Symbol) => {
+      val paramName = param.name.toString
+      if(param.typeSignature <:< typeOf[Option[String]])
+        m.get(paramName)
+      else
+        m.get(paramName).getOrElse(throw new IllegalArgumentException("Map is missing required parameter named " + paramName))
+    })
+
+    constructorMirror(constructorArgs:_*).asInstanceOf[T]
+  }
+}
+
 object Runner {
+  implicit val backendsDecoder: Encoder[Backends] = deriveEncoder[Backends]
+  implicit val jsonDecoder: Encoder[Backend] = deriveEncoder[Backend]
+
   def main(args: Array[String] = Array[String]()): Unit =  {
     val result = HAProxySocket.socketRequest("localhost", 9999, "show servers conn")
-    val headers = result.asScala.head.split(" ").filter(x => x != "#" && x != "-")
-                                 .map(_.replace("/",", ").replaceAll("\\[[0-9]+\\]","").underscoreToCamelCase).toList // +:
-    val values = result.asScala.toList.drop(1).foldLeft(List[List[String]]())((acc, str) => acc.appended(str.replace("/", " ").split(" ").filter(_ != "-").toList))
-    // I started with csv, this is super shitty and it will be fixed
-    // TODO: also add encoding of the case class after clean up
-    val csv = CSVReader.open(Source.fromString(headers.mkString(",") + "\n" ++ values.map(_.mkString(",")).mkString("\n")))
-
-    println(csv.allWithHeaders().asJson)
-    ()
-
+    val formatted = HAProxySocket.socketResponse(result)
+    val loo = formatted.foldLeft(List[Backend]())((acc, item) => {
+      acc ++: List(ccFromMap.fromMap[Backend](item))
+    })
   }
 }
