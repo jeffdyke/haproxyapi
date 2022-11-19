@@ -1,5 +1,6 @@
 .vscode
 .metals
+docker/out/*
 out/*
 .bloop
 .bsp
