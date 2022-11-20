@@ -17,6 +17,7 @@ trait HAProxyError {
 }
 
 
+
 object BackendMatchError extends HAProxyError {
   val error = "Can't find backend"
 }
