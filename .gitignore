@@ -2,6 +2,8 @@
 .metals
 docker/out/*
 out/*
+haproxyapi/out*
+haproxyapi/src/out*
 .bloop
 .bsp
 docker/runtime/*
