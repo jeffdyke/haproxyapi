@@ -22,9 +22,9 @@ object haproxyapi extends ScalaModule {
     case _                            => throw new Exception("Unknown platform!")
   }
 
-  // Add dependency on JavaFX libraries, OS dependent
-  val javaFXModules = List("base", "controls", "fxml", "graphics", "media", "swing", "web")
-    .map(m => ivy"org.openjfx:javafx-$m:17.0.1;classifier=$osName")
+  // // Add dependency on JavaFX libraries, OS dependent
+  // val javaFXModules = List("base", "controls", "fxml", "graphics", "media", "swing", "web")
+  //   .map(m => ivy"org.openjfx:javafx-$m:17.0.1;classifier=$osName")
 
   def mainClass = Some("haproxyapi.Runner")
 }

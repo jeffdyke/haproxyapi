@@ -37,14 +37,8 @@ class Commands(config: Config) {
   } yield lar
 
   def getBackend(backend: String) = mappedResponse(s"show servers conn ${backend}")
-  //   def enableServer(backend: String, server: String) = getResponse(s"enable server ${backend}/${server}")
-  def checkServers(backend: String, server: Option[String]) = {
 
-  }
-  def checkServer(backend: String, server: String) = checkServers(backend, Some(server))
-  // def getBackend(backend: String) = {
-  //   getResponse()
-  // }
+  // req <- HAProxySocket.socketRequest(config.host, config.port, cmd)
 }
 object Commands {
   def apply(config: Config) = {

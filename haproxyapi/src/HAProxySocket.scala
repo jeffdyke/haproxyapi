@@ -48,7 +48,6 @@ object HAProxySocket {
   def inputStream(socket: Socket): Resource[IO, InputStreamReader] =
     Resource.fromAutoCloseable(IO.blocking(new InputStreamReader(socket.getInputStream)))
 
-
   def socketRequest(host: String, port: Int, cmd: String): Either[HAProxyError, List[String]]  =
     (
       for {
@@ -72,14 +71,13 @@ object HAProxySocket {
       case Right(a) => Right({
 
         val headers = a.head.replace("/"," ").split(" ").filter(x => x != "#" && x != "-")
-                                .map(_.replaceAll("\\[[0-9]+\\]","").underscoreToCamelCase).toList.map(_.trim())
+                                .map(_.replaceAll("\\[[0-9]+\\]","").underscoreToCamelCase).toList
         val values = a.drop(1).foldLeft(List[List[String]]())((acc, str) =>
-                            acc.appended(str.replace("/", " ").split(" ").filter(_ != "-").toList)).filter(_.nonEmpty)
+                            acc.appended(str.replace("/", " ").split(" ").filter(_ != "-").toList))
         val mapped = values.filter(_.nonEmpty)
           .map(_.zipWithIndex)
           .map(value => value.slice(0, headers.length))
           .map(_.map(x => (headers(x._2).trim() -> x._1)).toMap)
-        println(mapped)
         mapped
 
       })
