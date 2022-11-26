@@ -51,4 +51,5 @@ object models {
     srvCheckStatus: String
   ) extends HAProxyResponse
 
+  case class HAProxyNoResult(empty: Option[String]) extends HAProxyResponse
 }

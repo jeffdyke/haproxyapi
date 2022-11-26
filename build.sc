@@ -10,7 +10,6 @@ object haproxyapi extends ScalaModule {
     ivy"org.http4s::http4s-dsl:0.23.14",
     ivy"io.circe::circe-generic:0.14.3",
     ivy"com.kohlschutter.junixsocket:junixsocket-core:2.6.1",
-    ivy"com.github.tototoshi::scala-csv:1.3.10",
     ivy"org.slf4j:slf4j-api:2.0.3",
     ivy"org.slf4j:slf4j-simple:2.0.3",
     ivy"com.lihaoyi::pprint:0.7.0",

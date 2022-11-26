@@ -8,7 +8,12 @@ import haproxyapi.models._
 object Backend{
   implicit val be = LabelledGeneric[models.Backend]
 }
-
+object BackendsState {
+  implicit val bs = LabelledGeneric[models.BackendState]
+}
+object EmptyResponse {
+  implicit val er = LabelledGeneric[models.HAProxyNoResult]
+}
 trait FromMap[L <: HList] {
   def apply(m: Map[String, Any]): Option[L]
 }
@@ -34,8 +39,8 @@ class ParseCaseClass[A] {
   def from[R <: HList](m: Map[String, Any])(implicit
         gen: LabelledGeneric.Aux[A, R],
         fromMap: FromMap[R]): Option[A] = {
-        fromMap(m).map(hl => gen.from(hl))
-  }
+          fromMap(m).map(hl => gen.from(hl))
+        }
 }
 
 object ParseCaseClass {
