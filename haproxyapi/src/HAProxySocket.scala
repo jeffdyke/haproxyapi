@@ -49,7 +49,7 @@ object HAProxySocket {
     Resource.fromAutoCloseable(IO.blocking(new InputStreamReader(socket.getInputStream)))
 
 
-  def socketRequest(host: String, port: Int, cmd: String): List[String]  =
+  def socketRequest(host: String, port: Int, cmd: String): Either[HAProxyError, List[String]]  =
     (
       for {
         sock <- socket(host, port)
@@ -63,7 +63,7 @@ object HAProxySocket {
         in <- IO.blocking(new BufferedReader(inStream))
         // Some return values include the number of elements, we don't want that.
         output  = in.lines().toList.asScala.filter(line => returnVal.pattern.matcher(line).matches == false || line.isEmpty())
-      } yield output.toList
+      } yield Right(output.toList)
     }.unsafeRunSync()
 
   def socketResponse(result: List[String]): Either[HAProxyError, List[Map[String, String]]] = {
