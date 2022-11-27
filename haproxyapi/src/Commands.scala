@@ -65,11 +65,19 @@ class Commands(config: Config) {
     //decoded = lar.map(i => decode[models.Backend](i.toString()))
   } yield IO.pure(lar)
 
+  def backendState(cmd: String): Either[HAProxyError, IO[List[models.BackendState]]] = for {
+    resp <- rawResponse(cmd)
+    _ = pprint.pprintln(resp)
+    lar = resp.collect { case m: Map[String, Any] => ParseCaseClass.to[models.BackendState].from(m)}.flatten
+    //decoded = lar.map(i => decode[models.Backend](i.toString()))
+  } yield IO.pure(lar)
+
   def emptyResponse(cmd: String): Either[HAProxyError, IO[models.HAProxyNoResult]] = for {
     resp <- rawResponse(cmd)
   } yield IO.pure(new models.HAProxyNoResult(Some(s"No Result for ${cmd}")))
 
   def getBackend(backend: String) = bankendDetails(s"show servers conn ${backend}")
+  def getBackendState(backend: String) = backendState(s"show servers state ${backend}")
   def disableBackend(backend: String, server: String) = emptyResponse(s"disable server ${backend}/${server}")
   def enableBackend(backend: String, server: String) = emptyResponse(s"enable server ${backend}/${server}")
 

@@ -6,7 +6,7 @@ object Runner {
 
   def main(args: Array[String] = Array[String]()) = {
       val cmd = Commands(LocalConfig)
-      pprint.pprintln(cmd.listBackends)
+      pprint.pprintln(cmd.getBackendState("web_app1_h1"))
 
       // val resp = Commands(LocalConfig).enableBackend("web_app1_h1", "web_app1_h1")
 

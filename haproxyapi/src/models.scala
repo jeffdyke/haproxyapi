@@ -26,28 +26,28 @@ object models {
   case class Backends(name: String)
 
   case class BackendState(
-    srvCheckHealth: String,
+    srvCheckHealth: Int,
     beName: String,
-    srvIweight: String,
-    beId: String,
-    srvUweight: String,
-    srvFForcedId: String,
-    srvOpState: String,
-    srvAdminState: String,
-    srvCheckState: String,
-    srvAgentState: String,
-    srvCheckPort: String,
-    srvrecord: String,
-    srvId: String,
-    bkFForcedId: String,
+    srvIweight: Int,
+    beId: Int,
+    srvUweight: Int,
+    srvFForcedId: Int,
+    srvOpState: Int,
+    srvAdminState: Int,
+    srvCheckState: Int,
+    srvAgentState: Int,
+    srvCheckPort: Int,
+    srvrecord: Int,
+    srvId: Int,
+    bkFForcedId: Int,
     srvAddr: String,
-    srvUseSsl: String,
+    srvUseSsl: Int,
     srvFqdn: String,
     srvName: String,
-    srvCheckResult: String,
-    srvPort: String,
-    srvTimeSinceLastChange: String,
-    srvCheckStatus: String
+    srvCheckResult: Int,
+    srvPort: Int,
+    srvTimeSinceLastChange: Int,
+    srvCheckStatus: Int
   ) extends HAProxyResponse
 
   case class HAProxyNoResult(empty: Option[String]) extends HAProxyResponse
