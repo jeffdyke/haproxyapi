@@ -5,26 +5,25 @@ import io.circe.{Decoder, Encoder}
 
 object models {
   trait HAProxyResponse
-  case class Backends(backends: List[Backend])
   case class Backend(
     bkname: String,
     svname: String,
-    bkid: String,
-    svid: String,
+    bkid: Int,
+    svid: Int,
     addr: String,
-    port: String,
-    purgeDelay: String,
-    usedCur: String,
-    usedMax: String,
-    needEst: String,
-    unsafeNb: String,
-    safeNb: String,
-    idleLim: String,
-    idleCur: String,
-    idlePerThr: String
+    port: Int,
+    purgeDelay: Int,
+    usedCur: Int,
+    usedMax: Int,
+    needEst: Int,
+    unsafeNb: Int,
+    safeNb: Int,
+    idleLim: Int,
+    idleCur: Int,
+    idlePerThr: Int
   ) extends HAProxyResponse
 
-  case class BackendsState(backends: List[BackendState])
+  case class Backends(name: String)
 
   case class BackendState(
     srvCheckHealth: String,

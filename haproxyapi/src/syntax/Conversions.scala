@@ -5,15 +5,7 @@ import shapeless.labelled._
 import scala.util.Try
 import haproxyapi.models._
 
-object Backend{
-  implicit val be = LabelledGeneric[models.Backend]
-}
-object BackendsState {
-  implicit val bs = LabelledGeneric[models.BackendState]
-}
-object EmptyResponse {
-  implicit val er = LabelledGeneric[models.HAProxyNoResult]
-}
+
 trait FromMap[L <: HList] {
   def apply(m: Map[String, Any]): Option[L]
 }
