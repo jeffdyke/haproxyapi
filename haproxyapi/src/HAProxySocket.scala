@@ -73,11 +73,11 @@ object HAProxySocket {
         case t: Throwable => IO(Left(new ResourceError(s"Catch all: ${t.getMessage()}", Some(t))))
       })).unsafeRunSync()
 
-  def socketResponse(result: List[String]): Either[HAProxyError, List[Map[String, Either[String, Int]]]] = {
+  def socketResponse(result: List[String]): Either[HAProxyError, List[Map[String, Any]]] = {
     validateBadCommand(result) match {
       case Left(e:HAProxyError) => Left(e)
       //enable/disable don't return anything
-      case Right(e) if e.isEmpty => Right(List[Map[String,Either[String, Int]]]())
+      case Right(e) if e.isEmpty => Right(List[Map[String,String]]())
       case Right(a) => Right({
 
         // This takes the haproxy output, trims it down to the lenght of the headers and creates and ordered map (effectively a csv)
@@ -85,10 +85,10 @@ object HAProxySocket {
                                 .map(_.replaceAll("\\[[0-9]+\\]","").underscoreToCamelCase).toList
 
         // There are only two types String and Ints, so just hardcoding conversion
-        val values = a.slice(1,a.length -1).foldLeft(List[List[Either[String,Int]]]())((acc, str) =>
+        val values = a.slice(1,a.length -1).foldLeft(List[List[Any]]())((acc, str) =>
                             acc.appended(str.replace("/", " ").split(" ").filter(_ != "-").toList.map(m => m match {
-                              case si: String if returnVal.pattern.matcher(si).matches => Right(si.toInt)
-                              case s: String => Left(s)
+                              case si: String if returnVal.pattern.matcher(si).matches => si.toInt
+                              case s: String => s
                             })))
         val mapped = values.filter(_.nonEmpty)
           .map(_.zipWithIndex)

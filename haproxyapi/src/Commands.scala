@@ -5,8 +5,12 @@ import cats._
 import cats.data.{Kleisli, EitherT}
 import cats.effect.IO
 import shapeless._
+import io.circe._
+import io.circe.generic.auto._
+import io.circe.parser.decode
 import io.circe.syntax._
-// import io.circe.generic.semiauto._
+import io.circe.generic.semiauto._
+
 
 object results {
   type Result[A] = Either[HAProxyError, A]
@@ -28,7 +32,8 @@ object LocalConfig extends Config {
 
 
 class Commands(config: Config) {
-  import io.circe._, io.circe.generic.auto._, io.circe.syntax._
+  val intRe = "(-?[0-9]+)".r
+
 
   implicit val encodeIntOrString: Encoder[Either[Int, String]] =
     Encoder.instance(_.fold(_.asJson, _.asJson))
@@ -36,23 +41,44 @@ class Commands(config: Config) {
   implicit val decodeIntOrString: Decoder[Either[Int, String]] =
     Decoder[Int].map(Left(_)).or(Decoder[String].map(Right(_)))
 
-  def rawResponse(cmd: String): Either[HAProxyError, List[Map[String,Either[String, Int]]]] = for {
+
+  implicit val lgenBackend = LabelledGeneric[models.Backend]
+  implicit val lgenBackendState = LabelledGeneric[models.BackendState]
+
+  def rawResponse(cmd: String): Either[HAProxyError, List[Map[String,Any]]] = for {
     req <- HAProxySocket.socketRequest(config.host, config.port, cmd)
     resp <- HAProxySocket.socketResponse(req)
+  } yield resp
 
-    } yield resp
+  def strOrInt(s: String): Either[String, Int] = s match {
+    case intRe(s) => Right(s.toInt)
+    case s => Left(s)
+  }
 
-  def mappedResponse(cmd: String): Either[HAProxyError, List[io.circe.Json]] = for {
+  def bankendDetails(cmd: String): Either[HAProxyError, IO[List[models.Backend]]] = for {
     resp <- rawResponse(cmd)
-    lar = resp.map(_.asJson)
-  } yield lar
+    // parsable = resp.foldLeft(Map[String, Either[String, Int]]())((acc, mofa) =>
+    //   acc + (mofa.toMap.keys.head -> strOrInt(mofa.toMap.values.head.toString())))
+    //lar = parsable.map(_.asJson)
+    //_ = pprint.pprintln(lar.toString)
+    lar = resp.collect { case m: Map[String, Any] => ParseCaseClass.to[models.Backend].from(m)}.flatten
+    //decoded = lar.map(i => decode[models.Backend](i.toString()))
+  } yield IO.pure(lar)
 
-  def getBackend(backend: String) = mappedResponse(s"show servers conn ${backend}")
-  def disableBackend(backend: String, server: String) = mappedResponse(s"disable server ${backend}/${server}")
-  def enableBackend(backend: String, server: String) = mappedResponse(s"enable server ${backend}/${server}")
-  def rawCommand(cmd: String) = mappedResponse(cmd)
-  // req <- HAProxySocket.socketRequest(config.host, config.port, cmd)
+  def emptyResponse(cmd: String): Either[HAProxyError, IO[models.HAProxyNoResult]] = for {
+    resp <- rawResponse(cmd)
+  } yield IO.pure(new models.HAProxyNoResult(Some(s"No Result for ${cmd}")))
+
+  def getBackend(backend: String) = bankendDetails(s"show servers conn ${backend}")
+  def disableBackend(backend: String, server: String) = emptyResponse(s"disable server ${backend}/${server}")
+  def enableBackend(backend: String, server: String) = emptyResponse(s"enable server ${backend}/${server}")
+
+  def listBackends: Either[HAProxyError, IO[List[models.Backends]]] = for {
+    raw <- rawResponse("show backend")
+    resp = raw.collect {m: Map[String, Any] => ParseCaseClass.to[models.Backends].from(m)}.flatten
+  } yield IO.pure(resp)
 }
+
 object Commands {
   def apply(config: Config) = {
     new Commands(config)
