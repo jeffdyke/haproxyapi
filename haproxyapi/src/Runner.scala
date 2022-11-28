@@ -1,8 +1,15 @@
 package haproxyapi
+import pprint._
 
 object Runner {
-  def main(args: Array[String] = Array[String]()): Unit =  {
-    val result = HAProxySocket.socketRequest("show servers conn")
-    println(s"post result ${result}")
+
+
+  def main(args: Array[String] = Array[String]()) = {
+      val cmd = Commands(LocalConfig)
+      pprint.pprintln(cmd.simpleRestart("web_app1_h1","web_app1_h1"))
+
+      // val resp = Commands(LocalConfig).enableBackend("web_app1_h1", "web_app1_h1")
+
+      // pprint.pprintln(resp)
   }
 }

@@ -43,3 +43,29 @@ services:
       - 8010:80
       - 8011:81
     restart: on-failure
+  webapp_server_3:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+      args:
+        SERVER_NAME: webapp_server_3
+      network: host
+    container_name: webapp_server_3
+    hostname: webapp_server_3
+    ports:
+      - 8020:80
+      - 8021:81
+    restart: on-failure
+  webapp_server_4:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+      args:
+        SERVER_NAME: webapp_server_4
+      network: host
+    container_name: webapp_server_4
+    hostname: webapp_server_4
+    ports:
+      - 8030:80
+      - 8031:81
+    restart: on-failure
