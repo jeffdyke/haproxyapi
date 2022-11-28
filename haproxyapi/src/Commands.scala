@@ -33,17 +33,7 @@ object LocalConfig extends Config {
 
 class Commands(config: Config) {
   val intRe = "(-?[0-9]+)".r
-
-  // Not being used
-  // implicit val encodeIntOrString: Encoder[Either[Int, String]] =
-  //   Encoder.instance(_.fold(_.asJson, _.asJson))
-
-  // implicit val decodeIntOrString: Decoder[Either[Int, String]] =
-  //   Decoder[Int].map(Left(_)).or(Decoder[String].map(Right(_)))
-
-
-  // implicit val lgenBackend = LabelledGeneric[models.Backend]
-  // implicit val lgenBackendState = LabelledGeneric[models.BackendState]
+  def sleeper = Right({println("Yawwwwwmmmmmm"); Thread.sleep(1000); println("hey i'm in here")})
 
   def rawResponse(cmd: String): Either[HAProxyError, List[Map[String,Any]]] = for {
     req <- HAProxySocket.socketRequest(config.host, config.port, cmd)
@@ -72,7 +62,7 @@ class Commands(config: Config) {
 
   def emptyResponse(cmd: String): Either[HAProxyError, IO[models.HAProxyNoResult]] = for {
     resp <- rawResponse(cmd)
-  } yield IO.pure(new models.HAProxyNoResult(Some(s"No Result for ${cmd} -- for [enable|disable] commands empty is good")))
+  } yield IO.pure(new models.HAProxyNoResult(Some(s"No Result for ${cmd} (normally positive)")))
 
   def listBackends: Either[HAProxyError, IO[List[models.Backends]]] = for {
     raw <- rawResponse("show backend")
@@ -81,26 +71,27 @@ class Commands(config: Config) {
 
   def getBackend(backend: String) = backendDetails(s"show servers conn ${backend}")
   def getBackendState(backend: String) = backendState(s"show servers state ${backend}")
+
   def disableBackend(backend: String, server: String) = emptyResponse(s"disable server ${backend}/${server}")
   def enableBackend(backend: String, server: String) = emptyResponse(s"enable server ${backend}/${server}")
 
-  def restartWith(backend: String, server: String, f: Unit => Unit) = for {
+  def restartWith(backend: String, server: String, f: () => Either[HAProxyError, Unit]) = for {
     be <- disableBackend(backend, server)
     _ = println(s"Disabled ${backend}/${server}")
     be <- enableBackend(backend, server)
-    _ = f()
-    _ = println(s"Enabled ${backend}/${server}")
-    backendS <- getBackend(backend).map(_.map(_.filter(_.svname == server)))
-  } yield ()
+    _ <-  f()
+    _ = println(s"Enabled ${backend}/${server} after function")
+    backendS <- getBackend(backend)
+  } yield backendS
 
   def simpleRestart(backend: String, server: String) = for {
     be <- disableBackend(backend, server)
     _ = println(s"Disabled ${backend}/${server}")
+    _ <- sleeper
     be <- enableBackend(backend, server)
-    _ = println(s"Enabled ${backend}/${server}")
-    backendS <- getBackend(backend).map(_.map(_.filter(_.svname == server)))
-
-  } yield pprint.pprintln(backend)
+    _ = println(s"Enabled ${backend}/${server} after sleeper")
+    backendS <- getBackend(backend)
+  } yield backendS
 }
 
 object Commands {
