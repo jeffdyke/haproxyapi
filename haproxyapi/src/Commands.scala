@@ -10,7 +10,8 @@ import io.circe.generic.auto._
 import io.circe.parser.decode
 import io.circe.syntax._
 import io.circe.generic.semiauto._
-import com.typesafe.scalalogging._
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 object results {
@@ -35,7 +36,7 @@ object LocalConfig extends Config {
 class Commands(config: Config) {
   val intRe = "(-?[0-9]+)".r
 
-  val logger = Logger("HAProxyCommands")
+  val logger = LoggerFactory.getLogger("HAProxyCommands")
   def sleeper = Right({logger.info("Yawn...sleeping"); Thread.sleep(1000); logger.info("I'm awake")})
   def rawResponse(cmd: String): Either[HAProxyError, List[Map[String,Any]]] = for {
     req <- HAProxySocket.socketRequest(config.host, config.port, cmd)
@@ -93,6 +94,7 @@ class Commands(config: Config) {
     be <- enableBackend(backend, server)
     _ = logger.info(s"Enabled ${backend}/${server} after sleeper")
     backendS <- getBackend(backend)
+    _ = logger.info(s"End ${backendS.map(_.map(s => s))}")
   } yield backendS
 }
 

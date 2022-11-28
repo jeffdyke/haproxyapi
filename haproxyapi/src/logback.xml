@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <appender name="SYNCSTDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level [%file:%line] %logger{36} - %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <appender name="STDOUT" class="ch.qos.logback.classic.AsyncAppender">
+    <appender-ref ref="SYNCSTDOUT" />
+  </appender>
+
+  <appender name="STDOUT-WARN" class="ch.qos.logback.classic.AsyncAppender">
+    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+      <level>WARN</level>
+    </filter>
+    <appender-ref ref="SYNCSTDOUT" />
+  </appender>
+
+  <appender name="NOOP" class="ch.qos.logback.core.helpers.NOPAppender" />
+</configuration>
