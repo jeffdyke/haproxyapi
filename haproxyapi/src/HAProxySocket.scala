@@ -50,6 +50,7 @@ object HAProxySocket {
     Resource.fromAutoCloseable(IO.blocking(new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())))))
 
   def inputStream(socket: Socket): Resource[IO, InputStreamReader] =
+
     Resource.fromAutoCloseable(IO.blocking(new InputStreamReader(socket.getInputStream)))
 
   def socketRequest(host: String, port: Int, cmd: String): Either[HAProxyError, List[String]]  =
