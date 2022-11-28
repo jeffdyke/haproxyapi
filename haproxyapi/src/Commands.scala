@@ -10,6 +10,7 @@ import io.circe.generic.auto._
 import io.circe.parser.decode
 import io.circe.syntax._
 import io.circe.generic.semiauto._
+import com.typesafe.scalalogging._
 
 
 object results {
@@ -33,8 +34,9 @@ object LocalConfig extends Config {
 
 class Commands(config: Config) {
   val intRe = "(-?[0-9]+)".r
-  def sleeper = Right({println("Yawwwwwmmmmmm"); Thread.sleep(1000); println("hey i'm in here")})
 
+  val logger = Logger("HAProxyCommands")
+  def sleeper = Right({logger.info("Yawn...sleeping"); Thread.sleep(1000); logger.info("I'm awake")})
   def rawResponse(cmd: String): Either[HAProxyError, List[Map[String,Any]]] = for {
     req <- HAProxySocket.socketRequest(config.host, config.port, cmd)
     resp <- HAProxySocket.socketResponse(req)
@@ -77,19 +79,19 @@ class Commands(config: Config) {
 
   def restartWith(backend: String, server: String, f: () => Either[HAProxyError, Unit]) = for {
     be <- disableBackend(backend, server)
-    _ = println(s"Disabled ${backend}/${server}")
+    _ = logger.info(s"Disabled ${backend}/${server}")
     be <- enableBackend(backend, server)
     _ <-  f()
-    _ = println(s"Enabled ${backend}/${server} after function")
+    _ = logger.info(s"Enabled ${backend}/${server} after function")
     backendS <- getBackend(backend)
   } yield backendS
 
   def simpleRestart(backend: String, server: String) = for {
     be <- disableBackend(backend, server)
-    _ = println(s"Disabled ${backend}/${server}")
+    _ = logger.info(s"Disabled ${backend}/${server}")
     _ <- sleeper
     be <- enableBackend(backend, server)
-    _ = println(s"Enabled ${backend}/${server} after sleeper")
+    _ = logger.info(s"Enabled ${backend}/${server} after sleeper")
     backendS <- getBackend(backend)
   } yield backendS
 }
