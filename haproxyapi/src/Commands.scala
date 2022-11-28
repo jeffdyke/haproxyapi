@@ -34,16 +34,16 @@ object LocalConfig extends Config {
 class Commands(config: Config) {
   val intRe = "(-?[0-9]+)".r
 
+  // Not being used
+  // implicit val encodeIntOrString: Encoder[Either[Int, String]] =
+  //   Encoder.instance(_.fold(_.asJson, _.asJson))
 
-  implicit val encodeIntOrString: Encoder[Either[Int, String]] =
-    Encoder.instance(_.fold(_.asJson, _.asJson))
-
-  implicit val decodeIntOrString: Decoder[Either[Int, String]] =
-    Decoder[Int].map(Left(_)).or(Decoder[String].map(Right(_)))
+  // implicit val decodeIntOrString: Decoder[Either[Int, String]] =
+  //   Decoder[Int].map(Left(_)).or(Decoder[String].map(Right(_)))
 
 
-  implicit val lgenBackend = LabelledGeneric[models.Backend]
-  implicit val lgenBackendState = LabelledGeneric[models.BackendState]
+  // implicit val lgenBackend = LabelledGeneric[models.Backend]
+  // implicit val lgenBackendState = LabelledGeneric[models.BackendState]
 
   def rawResponse(cmd: String): Either[HAProxyError, List[Map[String,Any]]] = for {
     req <- HAProxySocket.socketRequest(config.host, config.port, cmd)
@@ -55,7 +55,7 @@ class Commands(config: Config) {
     case s => Left(s)
   }
 
-  def bankendDetails(cmd: String): Either[HAProxyError, IO[List[models.Backend]]] = for {
+  def backendDetails(cmd: String): Either[HAProxyError, IO[List[models.Backend]]] = for {
     resp <- rawResponse(cmd)
     // parsable = resp.foldLeft(Map[String, Either[String, Int]]())((acc, mofa) =>
     //   acc + (mofa.toMap.keys.head -> strOrInt(mofa.toMap.values.head.toString())))
@@ -67,29 +67,47 @@ class Commands(config: Config) {
 
   def backendState(cmd: String): Either[HAProxyError, IO[List[models.BackendState]]] = for {
     resp <- rawResponse(cmd)
-    _ = pprint.pprintln(resp)
     lar = resp.collect { case m: Map[String, Any] => ParseCaseClass.to[models.BackendState].from(m)}.flatten
-    //decoded = lar.map(i => decode[models.Backend](i.toString()))
   } yield IO.pure(lar)
 
   def emptyResponse(cmd: String): Either[HAProxyError, IO[models.HAProxyNoResult]] = for {
     resp <- rawResponse(cmd)
-  } yield IO.pure(new models.HAProxyNoResult(Some(s"No Result for ${cmd}")))
-
-  def getBackend(backend: String) = bankendDetails(s"show servers conn ${backend}")
-  def getBackendState(backend: String) = backendState(s"show servers state ${backend}")
-  def disableBackend(backend: String, server: String) = emptyResponse(s"disable server ${backend}/${server}")
-  def enableBackend(backend: String, server: String) = emptyResponse(s"enable server ${backend}/${server}")
+  } yield IO.pure(new models.HAProxyNoResult(Some(s"No Result for ${cmd} -- for [enable|disable] commands empty is good")))
 
   def listBackends: Either[HAProxyError, IO[List[models.Backends]]] = for {
     raw <- rawResponse("show backend")
     resp = raw.collect {m: Map[String, Any] => ParseCaseClass.to[models.Backends].from(m)}.flatten
   } yield IO.pure(resp)
+
+  def getBackend(backend: String) = backendDetails(s"show servers conn ${backend}")
+  def getBackendState(backend: String) = backendState(s"show servers state ${backend}")
+  def disableBackend(backend: String, server: String) = emptyResponse(s"disable server ${backend}/${server}")
+  def enableBackend(backend: String, server: String) = emptyResponse(s"enable server ${backend}/${server}")
+
+  def restartWith(backend: String, server: String, f: Unit => Unit) = for {
+    be <- disableBackend(backend, server)
+    _ = println(s"Disabled ${backend}/${server}")
+    be <- enableBackend(backend, server)
+    _ = f()
+    _ = println(s"Enabled ${backend}/${server}")
+    backendS <- getBackend(backend).map(_.map(_.filter(_.svname == server)))
+  } yield ()
+
+  def simpleRestart(backend: String, server: String) = for {
+    be <- disableBackend(backend, server)
+    _ = println(s"Disabled ${backend}/${server}")
+    be <- enableBackend(backend, server)
+    _ = println(s"Enabled ${backend}/${server}")
+    backendS <- getBackend(backend).map(_.map(_.filter(_.svname == server)))
+
+  } yield pprint.pprintln(backend)
 }
 
 object Commands {
   def apply(config: Config) = {
     new Commands(config)
   }
+
+
 
 }

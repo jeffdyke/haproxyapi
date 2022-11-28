@@ -23,7 +23,7 @@ object models {
     idlePerThr: Int
   ) extends HAProxyResponse
 
-  case class Backends(name: String)
+  case class Backends(name: String) extends HAProxyResponse
 
   case class BackendState(
     srvCheckHealth: Int,
