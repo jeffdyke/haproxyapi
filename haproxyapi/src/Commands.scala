@@ -43,34 +43,24 @@ class Commands(config: Config) {
     resp <- HAProxySocket.socketResponse(req)
   } yield resp
 
-  def strOrInt(s: String): Either[String, Int] = s match {
-    case intRe(s) => Right(s.toInt)
-    case s => Left(s)
-  }
-
-  def backendDetails(cmd: String): Either[HAProxyError, IO[List[models.Backend]]] = for {
+  def backendDetails(cmd: String): Either[HAProxyError, List[models.Backend]] = for {
     resp <- rawResponse(cmd)
-    // parsable = resp.foldLeft(Map[String, Either[String, Int]]())((acc, mofa) =>
-    //   acc + (mofa.toMap.keys.head -> strOrInt(mofa.toMap.values.head.toString())))
-    //lar = parsable.map(_.asJson)
-    //_ = pprint.pprintln(lar.toString)
     lar = resp.collect { case m: Map[String, Any] => ParseCaseClass.to[models.Backend].from(m)}.flatten
-    //decoded = lar.map(i => decode[models.Backend](i.toString()))
-  } yield IO.pure(lar)
+  } yield lar
 
-  def backendState(cmd: String): Either[HAProxyError, IO[List[models.BackendState]]] = for {
+  def backendState(cmd: String): Either[HAProxyError, List[models.BackendState]] = for {
     resp <- rawResponse(cmd)
     lar = resp.collect { case m: Map[String, Any] => ParseCaseClass.to[models.BackendState].from(m)}.flatten
-  } yield IO.pure(lar)
+  } yield lar
 
-  def emptyResponse(cmd: String): Either[HAProxyError, IO[models.HAProxyNoResult]] = for {
+  def emptyResponse(cmd: String): Either[HAProxyError, models.HAProxyNoResult] = for {
     resp <- rawResponse(cmd)
-  } yield IO.pure(new models.HAProxyNoResult(Some(s"No Result for ${cmd} (normally positive)")))
+  } yield new models.HAProxyNoResult(Some(s"No Result for ${cmd} (normally positive)"))
 
-  def listBackends: Either[HAProxyError, IO[List[models.Backends]]] = for {
+  def listBackends: Either[HAProxyError, List[models.Backends]] = for {
     raw <- rawResponse("show backend")
     resp = raw.collect {m: Map[String, Any] => ParseCaseClass.to[models.Backends].from(m)}.flatten
-  } yield IO.pure(resp)
+  } yield resp
 
   def getBackend(backend: String) = backendDetails(s"show servers conn ${backend}")
   def getBackendState(backend: String) = backendState(s"show servers state ${backend}")
@@ -82,19 +72,18 @@ class Commands(config: Config) {
     be <- disableBackend(backend, server)
     _ = logger.info(s"Disabled ${backend}/${server}")
     be <- enableBackend(backend, server)
-    _ <-  f()
+    _ <- f()
     _ = logger.info(s"Enabled ${backend}/${server} after function")
     backendS <- getBackend(backend)
   } yield backendS
 
-  def simpleRestart(backend: String, server: String) = for {
+  def restart(backend: String, server: String) = for {
     be <- disableBackend(backend, server)
     _ = logger.info(s"Disabled ${backend}/${server}")
     _ <- sleeper
     be <- enableBackend(backend, server)
     _ = logger.info(s"Enabled ${backend}/${server} after sleeper")
     backendS <- getBackend(backend)
-    _ = logger.info(s"End ${backendS.map(_.map(s => s))}")
   } yield backendS
 }
 
@@ -102,7 +91,4 @@ object Commands {
   def apply(config: Config) = {
     new Commands(config)
   }
-
-
-
 }

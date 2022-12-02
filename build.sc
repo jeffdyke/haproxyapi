@@ -17,17 +17,6 @@ object haproxyapi extends ScalaModule {
     ivy"ch.qos.logback:logback-classic:1.3.5",
     ivy"com.typesafe.scala-logging::scala-logging:3.9.4"
   )
-  // lazy val osName = System.getProperty("os.name") match {
-  //   case n if n.startsWith("Linux")   => "linux"
-  //   case n if n.startsWith("Mac")     => "mac"
-  //   case n if n.startsWith("Windows") => "win"
-  //   case _                            => throw new Exception("Unknown platform!")
-  // }
 
-  // // Add dependency on JavaFX libraries, OS dependent
-  // val javaFXModules = List("base", "controls", "fxml", "graphics", "media", "swing", "web")
-  //   .map(m => ivy"org.openjfx:javafx-$m:17.0.1;classifier=$osName")
-  // import ch.qos.logback.classic.util.ContextInitializer;
-  // System.setProperty(ContextInitializer.CONFIG_FILE_PROPERTY, "/src/haproxy/haproxy/src/logback.xml")
   def mainClass = Some("haproxyapi.Runner")
 }
